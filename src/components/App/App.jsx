@@ -2,12 +2,12 @@
 import {useState, useEffect} from 'react';
 import axios from 'axios';
 
-const creatureData = [
-    {id:1, name :'Unicorn', origin: 'Britain'},
-    {id:2, name: 'Sphinx', origin: 'Egypt'},
-    {id:3, name: 'Jackalope', origin: 'America'},
-    {id:4, name: 'Komodo Dragon', origin: 'Indonesia'}
-  ];
+// const creatureData = [
+//     {id:1, name :'Unicorn', origin: 'Britain'},
+//     {id:2, name: 'Sphinx', origin: 'Egypt'},
+//     {id:3, name: 'Jackalope', origin: 'America'},
+//     {id:4, name: 'Komodo Dragon', origin: 'Indonesia'}
+//   ];
 
 function App () {
   const [creatureList, setCreatureList] = useState([]);
@@ -33,28 +33,47 @@ function App () {
     .catch((error) => {
       console.log('error getting creatures', error);
     });
-  }
+  };
 
   const addCreature = (event) => {
     event.preventDefault();
-    console.log('add creature clicked!');
-  }
+    console.log('add creature clicked!', newCreatureName, newCreatureOrigin);
+    //post request following
+    axios({
+      method: 'POST',
+      url: '/creature',
+      data: {
+        name: newCreatureName,
+        origin: newCreatureOrigin
+      }
+    })
+    .then((response) => {
+      console.log(response);
+      setNewCreatureName('');
+      setNewCreatureOrigin('');
+      fetchCreatures();
+    })
+    .catch((error) => {
+      console.log(error)
+    });
+  };
+
   return (
     <div>
      <h2>Add Creature</h2>
      <h4>{newCreatureName} {newCreatureOrigin}</h4>
      <form onSubmit={addCreature}>
         <label htmlFor="name">Name: </label>
-        <input id="name" onChange={(event) => setNewCreatureName(event.target.value)} />
+        <input id="name" value={newCreatureName} onChange={(event) => setNewCreatureName(event.target.value)} />
         <label htmlFor="origin">Origin: </label>
-        <input id="origin" onChange={(event) => setNewCreatureOrigin(event.target.value)} />
+        <input id="origin" value={newCreatureOrigin} onChange={(event) => setNewCreatureOrigin(event.target.value)} />
         <button type="submit">Add New Creature</button>
      </form>
      {/* {JSON.stringify(creatureList)} */}
      
       <ul>
         {creatureList.map(creature => (
-          <li key={creature.name}>
+          <li key={creature.id}>
             {creature.name} is from {creature.origin}
           </li>
         ))}
